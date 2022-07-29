@@ -29,22 +29,92 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.bControl = new System.Windows.Forms.Button();
+            this.lStatus = new System.Windows.Forms.Label();
+            this.lTime = new System.Windows.Forms.Label();
+            this.tDistraction = new System.Windows.Forms.TextBox();
+            this.bDistToggle = new System.Windows.Forms.Button();
             this.SuspendLayout();
+            // 
+            // bControl
+            // 
+            this.bControl.Location = new System.Drawing.Point(132, 119);
+            this.bControl.Name = "bControl";
+            this.bControl.Size = new System.Drawing.Size(75, 23);
+            this.bControl.TabIndex = 0;
+            this.bControl.Text = "START";
+            this.bControl.UseVisualStyleBackColor = true;
+            // 
+            // lStatus
+            // 
+            this.lStatus.AutoSize = true;
+            this.lStatus.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.lStatus.Location = new System.Drawing.Point(149, 9);
+            this.lStatus.Name = "lStatus";
+            this.lStatus.Size = new System.Drawing.Size(45, 21);
+            this.lStatus.TabIndex = 1;
+            this.lStatus.Text = "work";
+            // 
+            // lTime
+            // 
+            this.lTime.AutoSize = true;
+            this.lTime.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.lTime.Font = new System.Drawing.Font("Segoe UI", 48F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.lTime.Location = new System.Drawing.Point(77, 30);
+            this.lTime.Name = "lTime";
+            this.lTime.Size = new System.Drawing.Size(191, 86);
+            this.lTime.TabIndex = 2;
+            this.lTime.Text = "30:00";
+            this.lTime.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // tDistraction
+            // 
+            this.tDistraction.Location = new System.Drawing.Point(12, 177);
+            this.tDistraction.Multiline = true;
+            this.tDistraction.Name = "tDistraction";
+            this.tDistraction.Size = new System.Drawing.Size(317, 82);
+            this.tDistraction.TabIndex = 3;
+            this.tDistraction.Visible = false;
+            // 
+            // bDistToggle
+            // 
+            this.bDistToggle.FlatAppearance.BorderSize = 0;
+            this.bDistToggle.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bDistToggle.Location = new System.Drawing.Point(159, 148);
+            this.bDistToggle.Name = "bDistToggle";
+            this.bDistToggle.Size = new System.Drawing.Size(20, 23);
+            this.bDistToggle.TabIndex = 4;
+            this.bDistToggle.Text = "v";
+            this.bDistToggle.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.BackColor = System.Drawing.SystemColors.Control;
+            this.ClientSize = new System.Drawing.Size(345, 179);
+            this.Controls.Add(this.bDistToggle);
+            this.Controls.Add(this.tDistraction);
+            this.Controls.Add(this.lTime);
+            this.Controls.Add(this.lStatus);
+            this.Controls.Add(this.bControl);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Timer";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.Timer timer1;
+        private Button bControl;
+        private Label lStatus;
+        private Label lTime;
+        private TextBox tDistraction;
+        private Button bDistToggle;
     }
 }
