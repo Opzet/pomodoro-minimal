@@ -38,6 +38,11 @@
             this.bDistToggle = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
+            // timer1
+            // 
+            this.timer1.Interval = 1000;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // bControl
             // 
             this.bControl.BackColor = System.Drawing.SystemColors.ControlLightLight;
@@ -101,14 +106,14 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.ClientSize = new System.Drawing.Size(340, 276);
+            this.ClientSize = new System.Drawing.Size(340, 174);
             this.Controls.Add(this.bDistToggle);
             this.Controls.Add(this.tDistraction);
             this.Controls.Add(this.lTime);
             this.Controls.Add(this.lStatus);
             this.Controls.Add(this.bControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximumSize = new System.Drawing.Size(356, 413);
+            this.MaximumSize = new System.Drawing.Size(356, 213);
             this.MinimumSize = new System.Drawing.Size(356, 213);
             this.Name = "Form1";
             this.Text = "Timer";
