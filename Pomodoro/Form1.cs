@@ -19,6 +19,7 @@ namespace Pomodoro
         private byte longBreakPeriod = 3;
         private byte periodCounter = 0;
         public State state = State.work;
+        private string[] descriptors = new string[] { "work", "short break", "long break" };
 
         private byte minutes;
         private byte seconds;
@@ -30,7 +31,7 @@ namespace Pomodoro
 
         private void UpdateStatus()
         {
-            lStatus.Text = $"{state}";
+            lStatus.Text = $"{descriptors[(int)state]}";
             lStatus.Left = ClientSize.Width / 2 - lStatus.Width / 2;
         }
 
@@ -61,6 +62,12 @@ namespace Pomodoro
             }
             else
             {
+                using (StreamWriter sw = File.AppendText("distractions.txt"))
+                {
+                    if (tDistraction.Text != "")
+                        { sw.WriteLine(tDistraction.Text); }
+                }
+                tDistraction.Text = "";
                 bDistToggle.Text = "v";
                 Size normal = new Size(356, 213);
                 this.MaximumSize = normal;
@@ -80,7 +87,7 @@ namespace Pomodoro
             // time is over
             if (minutes == 0 && seconds == 0)
             {
-                State previous = state;
+                string previous = descriptors[(int)state];
                 switch (state)
                 {
                     case State.work:
