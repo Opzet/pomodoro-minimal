@@ -40,12 +40,18 @@
             // 
             // bControl
             // 
+            this.bControl.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.bControl.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.bControl.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bControl.ForeColor = System.Drawing.SystemColors.ControlText;
             this.bControl.Location = new System.Drawing.Point(132, 119);
             this.bControl.Name = "bControl";
             this.bControl.Size = new System.Drawing.Size(75, 23);
             this.bControl.TabIndex = 0;
+            this.bControl.TabStop = false;
             this.bControl.Text = "START";
-            this.bControl.UseVisualStyleBackColor = true;
+            this.bControl.UseVisualStyleBackColor = false;
+            this.bControl.Click += new System.EventHandler(this.bControl_Click);
             // 
             // lStatus
             // 
@@ -88,19 +94,22 @@
             this.bDistToggle.TabIndex = 4;
             this.bDistToggle.Text = "v";
             this.bDistToggle.UseVisualStyleBackColor = true;
+            this.bDistToggle.Click += new System.EventHandler(this.bDistToggle_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(345, 179);
+            this.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.ClientSize = new System.Drawing.Size(340, 276);
             this.Controls.Add(this.bDistToggle);
             this.Controls.Add(this.tDistraction);
             this.Controls.Add(this.lTime);
             this.Controls.Add(this.lStatus);
             this.Controls.Add(this.bControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximumSize = new System.Drawing.Size(356, 413);
+            this.MinimumSize = new System.Drawing.Size(356, 213);
             this.Name = "Form1";
             this.Text = "Timer";
             this.ResumeLayout(false);
