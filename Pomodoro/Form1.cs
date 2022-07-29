@@ -12,8 +12,12 @@ namespace Pomodoro
             UpdateStatus();
         }
 
-        public byte workTime = 15;
-        public byte playTime = 5;
+        public byte workTime = 7;
+        public byte shortBreakTime = 2;
+        public byte longBreakTime = 4;
+        // how many shortBreaks are between two longBreaks
+        private byte longBreakPeriod = 3;
+        private byte periodCounter = 0;
         public State state = State.work;
 
         private byte minutes;
@@ -76,13 +80,24 @@ namespace Pomodoro
             // time is over
             if (minutes == 0 && seconds == 0)
             {
+                State previous = state;
                 switch (state)
                 {
                     case State.work:
-                        state = State.shortBreak;
-                        minutes = playTime;
+                        periodCounter = (byte)((periodCounter + 1) % (longBreakPeriod + 1));
+                        if (periodCounter == 0)
+                        { 
+                            state = State.longBreak;
+                            minutes = longBreakTime;
+                        }
+                        else
+                        { 
+                            state = State.shortBreak;
+                            minutes = shortBreakTime;
+                        }
                         break;
                     case State.shortBreak:
+                    case State.longBreak:
                         state = State.work;
                         minutes = workTime;
                         break;
@@ -92,6 +107,8 @@ namespace Pomodoro
                 timer1.Enabled = false;
                 bControl.Text = "START";
                 UpdateStatus();
+                UpdateTime();
+                MessageBox.Show($"Your {previous} has ended.");
             }
             UpdateTime();
         }
