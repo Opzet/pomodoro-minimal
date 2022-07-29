@@ -8,6 +8,7 @@ namespace Pomodoro
             InitializeComponent();
             minutes = workTime;
             seconds = 0;
+            microseconds = 0;
             UpdateTime();
             UpdateStatus();
         }
@@ -23,6 +24,7 @@ namespace Pomodoro
 
         private byte minutes;
         private byte seconds;
+        private int microseconds;
 
         private void UpdateTime()
         {
@@ -85,12 +87,16 @@ namespace Pomodoro
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+            microseconds = microseconds - timer1.Interval;
+            if (microseconds <= 0)
+                { microseconds = 1000; }
             if (seconds == 0)
             { 
                 seconds = 60;
                 minutes--;
             }
-            seconds--;
+            if (microseconds == 1000)
+                { seconds--; }
             // time is over
             if (minutes == 0 && seconds == 0)
             {
