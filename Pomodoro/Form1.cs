@@ -6,18 +6,30 @@ namespace Pomodoro
         public Form1()
         {
             InitializeComponent();
+            minutes = workTime;
+            seconds = 0;
+            UpdateTime();
+            UpdateStatus();
         }
 
-        private byte minutes = 30;
-        private byte seconds = 0;
-
-        public byte workTime = 30;
+        public byte workTime = 15;
+        public byte playTime = 5;
         public State state = State.work;
+
+        private byte minutes;
+        private byte seconds;
 
         private void UpdateTime()
         {
             lTime.Text = $"{string.Format("{0:00}", minutes)}:{string.Format("{0:00}", seconds)}";
         }
+
+        private void UpdateStatus()
+        {
+            lStatus.Text = $"{state}";
+            lStatus.Left = ClientSize.Width / 2 - lStatus.Width / 2;
+        }
+
 
         private void bControl_Click(object sender, EventArgs e)
         {
@@ -61,12 +73,25 @@ namespace Pomodoro
                 minutes--;
             }
             seconds--;
+            // time is over
             if (minutes == 0 && seconds == 0)
             {
-                // switch state and set timer accordingly
-                minutes = 30;
+                switch (state)
+                {
+                    case State.work:
+                        state = State.shortBreak;
+                        minutes = playTime;
+                        break;
+                    case State.shortBreak:
+                        state = State.work;
+                        minutes = workTime;
+                        break;
+                    default:
+                        break;
+                }
                 timer1.Enabled = false;
                 bControl.Text = "START";
+                UpdateStatus();
             }
             UpdateTime();
         }
