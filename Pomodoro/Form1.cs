@@ -1,31 +1,48 @@
 namespace Pomodoro
 {
     public enum State { work, shortBreak, longBreak };
+
+    public enum Screen { settings, timer };
     public partial class Form1 : Form
     {
         public Form1()
         {
             InitializeComponent();
-            minutes = workTime;
-            seconds = 0;
-            microseconds = 0;
-            UpdateTime();
-            UpdateStatus();
+            bBack.Enabled = false;
+            DisplayScreen(Screen.settings);
         }
 
-        public byte workTime = 7;
-        public byte shortBreakTime = 2;
-        public byte longBreakTime = 4;
+        public byte workTime;
+        public byte shortBreakTime;
+        public byte longBreakTime;
         // how many shortBreaks are between two longBreaks
-        private byte longBreakPeriod = 3;
+        private byte longBreakPeriod;
         private byte periodCounter = 0;
-        public State state = State.work;
+        public State state;
         private string[] descriptors = new string[] { "work", "short break", "long break" };
 
         private byte minutes;
         private byte seconds;
         private int microseconds;
 
+        private void SetupTimer()
+        {
+            minutes = workTime;
+            seconds = 0;
+            microseconds = 0;
+            state = State.work;
+            UpdateTime();
+            UpdateStatus();
+        }
+
+        private void TurnTimer(bool on)
+        {
+            timer1.Enabled = on;
+            if (on)
+                { bControl.Text = "STOP"; }
+            else 
+                { bControl.Text = "START"; }
+        }
         private void UpdateTime()
         {
             lTime.Text = $"{string.Format("{0:00}", minutes)}:{string.Format("{0:00}", seconds)}";
@@ -37,18 +54,40 @@ namespace Pomodoro
             lStatus.Left = ClientSize.Width / 2 - lStatus.Width / 2;
         }
 
+        private void DisplayScreen(Screen screen)
+        {
+            bool toSettings;
+            if (screen == Screen.settings)
+                { toSettings = true; }
+            else 
+                { toSettings = false; }
+
+            lStatus.Visible = !toSettings;
+            lTime.Visible = !toSettings;
+            bControl.Visible = !toSettings;
+            bDistToggle.Visible = !toSettings;
+
+            lWork.Visible = toSettings;
+            nWork.Visible = toSettings;
+            lShort.Visible = toSettings;
+            nShort.Visible = toSettings;
+            lLong.Visible = toSettings;
+            nLong.Visible = toSettings;
+            lPeriod.Visible = toSettings;
+            nPeriod.Visible = toSettings;
+            bBack.Visible = toSettings;
+            bApply.Visible = toSettings;
+        }
 
         private void bControl_Click(object sender, EventArgs e)
         {
             if (bControl.Text == "START")
             {
-                timer1.Enabled = true;
-                bControl.Text = "STOP";
+                TurnTimer(true);
             }
             else
             {
-                timer1.Enabled = false;
-                bControl.Text = "START"; 
+                TurnTimer(false); 
             }
         }
 
@@ -125,13 +164,38 @@ namespace Pomodoro
                     default:
                         break;
                 }
-                timer1.Enabled = false;
-                bControl.Text = "START";
+                TurnTimer(false);
                 UpdateStatus();
                 UpdateTime();
                 MessageBox.Show($"Your {previous} has ended.");
             }
             UpdateTime();
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TurnTimer(false);
+            if (bDistToggle.Text == "^")
+                { bDistToggle.PerformClick(); }
+            DisplayScreen(Screen.settings);
+        }
+
+        private void bApply_Click(object sender, EventArgs e)
+        {
+            workTime = (byte)nWork.Value;
+            shortBreakTime = (byte)nShort.Value;
+            longBreakTime = (byte)nLong.Value;
+            longBreakPeriod = (byte)nPeriod.Value;
+
+            SetupTimer();
+            DisplayScreen(Screen.timer);
+            bBack.Enabled = true;
+        }
+
+        private void bBack_Click(object sender, EventArgs e)
+        {
+            DisplayScreen(Screen.timer);
+            TurnTimer(true);
         }
     }
 }
