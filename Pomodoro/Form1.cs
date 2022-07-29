@@ -80,7 +80,8 @@ namespace Pomodoro
                 this.MaximumSize = normal;
                 this.MinimumSize = normal;
                 this.tDistraction.Visible = false;
-                timer1.Enabled = true;
+                if (bControl.Text == "STOP")
+                    { timer1.Enabled = true; }
                 bControl.Enabled = true;
             }
         }
