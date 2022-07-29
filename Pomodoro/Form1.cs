@@ -54,6 +54,11 @@ namespace Pomodoro
         {
             if (bDistToggle.Text == "v")
             {
+                if (state == State.work)
+                { 
+                    timer1.Enabled = false;
+                    bControl.Enabled = false;
+                }
                 bDistToggle.Text = "^";
                 Size extended = new Size(356, 313);
                 this.MaximumSize = extended;
@@ -73,6 +78,8 @@ namespace Pomodoro
                 this.MaximumSize = normal;
                 this.MinimumSize = normal;
                 this.tDistraction.Visible = false;
+                timer1.Enabled = true;
+                bControl.Enabled = true;
             }
         }
 
