@@ -8,7 +8,7 @@ namespace Pomodoro
             InitializeComponent();
         }
 
-        private byte minutes = 0;
+        private byte minutes = 30;
         private byte seconds = 0;
 
         public byte workTime = 30;
@@ -55,17 +55,18 @@ namespace Pomodoro
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            seconds++;
-            if (seconds == 60)
+            if (seconds == 0)
             { 
-                seconds = 0;
-                minutes++;
+                seconds = 60;
+                minutes--;
             }
-            if (minutes == workTime)
+            seconds--;
+            if (minutes == 0 && seconds == 0)
             {
-                minutes = 0;
-                state = State.shortBreak;
+                // switch state and set timer accordingly
+                minutes = 30;
                 timer1.Enabled = false;
+                bControl.Text = "START";
             }
             UpdateTime();
         }
