@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 
 namespace PomodoroMinimal;
@@ -19,7 +20,7 @@ public class Config
 
 public class PomodoroTimer
 {
-    public bool On = true;
+    public bool On = false;
     public byte minutes;
     public byte seconds;
     // how many short breaks have I gone through
@@ -82,9 +83,18 @@ public class Model : INotifyPropertyChanged
 {
     private Config _config = new();
     public State state;
+    
+    // Timer setup
     private DispatcherTimer _clock;
     public PomodoroTimer Timer { get; }
     public string Time => $"{Timer.minutes:00}:{Timer.seconds:00}";
+    
+    // Start button setup
+    public bool StartButtonOn { get; } = true;
+    private readonly string[] StartButtonLabels = new[] { "START", "STOP" };
+    private bool StartButtonOnStart { get; set; } = true;
+
+    public string StartButtonText => StartButtonOnStart ? StartButtonLabels[0] : StartButtonLabels[1];
     
     public event PropertyChangedEventHandler? PropertyChanged;
     
@@ -107,6 +117,17 @@ public class Model : INotifyPropertyChanged
         {
             state = Timer.SecondUpdate(state);
             RaisePropertyChanged(nameof(Time));
+        }
+    }
+
+    public void StartStopClick()
+    {
+        if (StartButtonOn)
+        {
+            Timer.On = StartButtonOnStart;
+            StartButtonOnStart = !StartButtonOnStart;
+            RaisePropertyChanged(nameof(StartButtonOn));
+            RaisePropertyChanged(nameof(StartButtonText));
         }
     }
 }
