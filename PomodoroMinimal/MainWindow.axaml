@@ -10,7 +10,8 @@
         MinWidth="356"
         MaxHeight="260"
         MaxWidth="356"
-        x:DataType="local:Model">
+        x:DataType="local:Model"
+        RequestedThemeVariant="Light">
     
     
     <Design.DataContext>
@@ -22,7 +23,8 @@
         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Time}"></TextBlock>
         <Button HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" FontSize="12"
                 Command="{Binding StartStopClick}" Content="{Binding StartButtonText}"></Button>
-        <ToggleButton Name="NoteToggle" HorizontalAlignment="Center" Background="Transparent" Content="v"></ToggleButton>
-        <TextBox HorizontalAlignment="Center" IsVisible="{Binding #NoteToggle.IsChecked}" Width="300"></TextBox>
+        <ToggleButton Name="NoteToggle" HorizontalAlignment="Center" Background="Transparent" 
+                      Content="{Binding NotesToggleLabel}" Command="{Binding NotesToggled}"></ToggleButton>
+        <TextBox HorizontalAlignment="Center" Text="{Binding Notes}" IsVisible="{Binding #NoteToggle.IsChecked}" Width="300"></TextBox>
     </StackPanel>
 </Window>

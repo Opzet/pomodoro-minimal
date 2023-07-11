@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -91,15 +92,24 @@ public class Model : INotifyPropertyChanged
     public string Time => $"{Timer.minutes:00}:{Timer.seconds:00}";
     
     // Start button setup
-    public bool StartButtonOn { get; } = true;
+    public bool StartButtonOn { get; private set; } = true;
+    private bool _startButtonOnStart = true;
     private readonly string[] StartButtonLabels = new[] { "START", "STOP" };
 
-    public string StartButtonText => Timer.On ? StartButtonLabels[1] : StartButtonLabels[0];
+    public string StartButtonText => _startButtonOnStart ? StartButtonLabels[0] : StartButtonLabels[1];
     
     // Activity text setup
     private string[] _activities = new string[] { "work", "short break", "long break" };
     public string Activity => _activities[(int)state];
     
+    // Note toggle setup
+    //private string[] _toggleTexts = new string[] { "v", "^" };
+    public bool NotesDisplayed { get; set; }
+    public string Notes { get; set; }
+    private string PathToNotes = "distractions.txt";
+    private readonly string[] _notesToggleLabels = new string[] { "v", "^" };
+    public string NotesToggleLabel => NotesDisplayed ? _notesToggleLabels[1] : _notesToggleLabels[0];
+
     public event PropertyChangedEventHandler? PropertyChanged;
     
     // raises the above event
@@ -124,6 +134,7 @@ public class Model : INotifyPropertyChanged
             // if the update turned off the timer, it is due to activity change
             if (!Timer.On)
             {
+                _startButtonOnStart = true;
                 RaisePropertyChanged(nameof(StartButtonText));
                 RaisePropertyChanged(nameof(Activity));
             }
@@ -135,7 +146,39 @@ public class Model : INotifyPropertyChanged
         if (StartButtonOn)
         {
             Timer.On = !Timer.On;
+            _startButtonOnStart = !_startButtonOnStart;
             RaisePropertyChanged(nameof(StartButtonText));
         }
+    }
+
+    public void DisableStartButton()
+    {
+        StartButtonOn = false;
+        Timer.On = false;
+    }
+
+    public void NotesToggled()
+    {
+        StartButtonOn = NotesDisplayed;
+        if (NotesDisplayed)
+        {
+            using (StreamWriter sw = File.AppendText("distractions.txt"))
+            {
+                if (Notes != "")
+                {
+                    sw.WriteLine(Notes);
+                    Notes = "";
+                    RaisePropertyChanged(nameof(Notes));
+                }
+            }
+            Timer.On = !_startButtonOnStart;
+        }
+        else
+        {
+            Timer.On = false;
+        }
+
+        NotesDisplayed = !NotesDisplayed;
+        RaisePropertyChanged(nameof(NotesToggleLabel));
     }
 }
