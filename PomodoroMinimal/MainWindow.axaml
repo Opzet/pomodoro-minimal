@@ -2,17 +2,26 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PomodoroMinimal"
         mc:Ignorable="d" d:DesignWidth="356" d:DesignHeight="260"
         x:Class="PomodoroMinimal.MainWindow"
         Title="PomodoroMinimal"
         MinHeight="260"
-        MinWidth="356">
+        MinWidth="356"
+        MaxHeight="260"
+        MaxWidth="356"
+        x:DataType="local:Model">
+    
+    
+    <Design.DataContext>
+        <local:Model/>
+    </Design.DataContext>
     
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5">
         <TextBlock HorizontalAlignment="Center" FontSize="14">work</TextBlock>
-        <TextBlock HorizontalAlignment="Center" FontSize="36">29:43</TextBlock>
+        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Time}"></TextBlock>
         <Button HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" FontSize="12">START</Button>
-        <Button HorizontalAlignment="Center" Background="Transparent">v</Button>
-        <TextBox HorizontalAlignment="Center" IsVisible="True" Width="300"></TextBox>
+        <ToggleButton Name="NoteToggle" HorizontalAlignment="Center" Background="Transparent" Content="v"></ToggleButton>
+        <TextBox HorizontalAlignment="Center" IsVisible="{Binding #NoteToggle.IsChecked}" Width="300"></TextBox>
     </StackPanel>
 </Window>
