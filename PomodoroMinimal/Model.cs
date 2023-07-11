@@ -10,11 +10,11 @@ public enum State { Work, ShortBreak, LongBreak };
 
 public class Config
 {
-    public byte workTime = 25;
-    public byte shortBreakTime = 5;
-    public byte longBreakTime = 15;
+    public byte workTime = 1;
+    public byte shortBreakTime = 2;
+    public byte longBreakTime = 3;
     // how many shortBreaks are between two longBreaks
-    public byte longBreakPeriod = 2;
+    public byte longBreakPeriod = 1;
     public string[] descriptors = new string[] { "work", "short break", "long break" };
 }
 
@@ -38,7 +38,8 @@ public class PomodoroTimer
             seconds = 60;
             minutes--;
         }
-        seconds--;
+
+        seconds -= 20;
         // time is over
         if (minutes == 0 && seconds == 0)
         {
@@ -96,6 +97,10 @@ public class Model : INotifyPropertyChanged
 
     public string StartButtonText => StartButtonOnStart ? StartButtonLabels[0] : StartButtonLabels[1];
     
+    // Activity text setup
+    private string[] _activities = new string[] { "work", "short break", "long break" };
+    public string Activity => _activities[(int)state];
+    
     public event PropertyChangedEventHandler? PropertyChanged;
     
     // raises the above event
@@ -117,6 +122,13 @@ public class Model : INotifyPropertyChanged
         {
             state = Timer.SecondUpdate(state);
             RaisePropertyChanged(nameof(Time));
+            // if the update turned off the timer, it is due to activity change
+            if (!Timer.On)
+            {
+                StartButtonOnStart = true;
+                RaisePropertyChanged(nameof(StartButtonText));
+                RaisePropertyChanged(nameof(Activity));
+            }
         }
     }
 
@@ -126,7 +138,6 @@ public class Model : INotifyPropertyChanged
         {
             Timer.On = StartButtonOnStart;
             StartButtonOnStart = !StartButtonOnStart;
-            RaisePropertyChanged(nameof(StartButtonOn));
             RaisePropertyChanged(nameof(StartButtonText));
         }
     }

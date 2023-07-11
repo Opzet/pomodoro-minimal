@@ -18,7 +18,7 @@
     </Design.DataContext>
     
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5">
-        <TextBlock HorizontalAlignment="Center" FontSize="14">work</TextBlock>
+        <TextBlock HorizontalAlignment="Center" FontSize="14" Text="{Binding Activity}"></TextBlock>
         <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Time}"></TextBlock>
         <Button HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" FontSize="12"
                 Command="{Binding StartStopClick}" Content="{Binding StartButtonText}"></Button>
