@@ -93,9 +93,8 @@ public class Model : INotifyPropertyChanged
     // Start button setup
     public bool StartButtonOn { get; } = true;
     private readonly string[] StartButtonLabels = new[] { "START", "STOP" };
-    private bool StartButtonOnStart { get; set; } = true;
 
-    public string StartButtonText => StartButtonOnStart ? StartButtonLabels[0] : StartButtonLabels[1];
+    public string StartButtonText => Timer.On ? StartButtonLabels[1] : StartButtonLabels[0];
     
     // Activity text setup
     private string[] _activities = new string[] { "work", "short break", "long break" };
@@ -125,7 +124,6 @@ public class Model : INotifyPropertyChanged
             // if the update turned off the timer, it is due to activity change
             if (!Timer.On)
             {
-                StartButtonOnStart = true;
                 RaisePropertyChanged(nameof(StartButtonText));
                 RaisePropertyChanged(nameof(Activity));
             }
@@ -136,8 +134,7 @@ public class Model : INotifyPropertyChanged
     {
         if (StartButtonOn)
         {
-            Timer.On = StartButtonOnStart;
-            StartButtonOnStart = !StartButtonOnStart;
+            Timer.On = !Timer.On;
             RaisePropertyChanged(nameof(StartButtonText));
         }
     }
