@@ -143,23 +143,15 @@ public class Model : INotifyPropertyChanged
 
     public void StartStopClick()
     {
-        if (StartButtonOn)
-        {
-            Timer.On = !Timer.On;
-            _startButtonOnStart = !_startButtonOnStart;
-            RaisePropertyChanged(nameof(StartButtonText));
-        }
-    }
-
-    public void DisableStartButton()
-    {
-        StartButtonOn = false;
-        Timer.On = false;
+        Timer.On = !Timer.On;
+        _startButtonOnStart = !_startButtonOnStart;
+        RaisePropertyChanged(nameof(StartButtonText));
     }
 
     public void NotesToggled()
     {
         StartButtonOn = NotesDisplayed;
+        RaisePropertyChanged(nameof(StartButtonOn));
         if (NotesDisplayed)
         {
             using (StreamWriter sw = File.AppendText("distractions.txt"))
