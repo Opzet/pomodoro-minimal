@@ -138,6 +138,7 @@ public class Model : INotifyPropertyChanged
     public void ApplyClick()
     {
         _state = State.Work;
+        RaisePropertyChanged(nameof(Activity));
         Config.ProcessConfigInput();
         Timer = new PomodoroTimer(Config);
         _clock = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.MaxValue,
