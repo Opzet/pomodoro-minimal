@@ -2,7 +2,9 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
-using Avalonia.Interactivity;
+using System.Threading;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Primitives;
 using Avalonia.Threading;
 
 namespace PomodoroMinimal;
@@ -110,6 +112,8 @@ public class Model : INotifyPropertyChanged
     private readonly string[] _notesToggleLabels = new string[] { "v", "^" };
     public string NotesToggleLabel => NotesDisplayed ? _notesToggleLabels[1] : _notesToggleLabels[0];
 
+    public PopupWindow popup { get; set; } = new ();
+    
     public event PropertyChangedEventHandler? PropertyChanged;
     
     // raises the above event
@@ -129,6 +133,7 @@ public class Model : INotifyPropertyChanged
     {
         if (Timer.On)
         {
+            var previousState = state;
             state = Timer.SecondUpdate(state);
             RaisePropertyChanged(nameof(Time));
             // if the update turned off the timer, it is due to activity change
@@ -137,6 +142,11 @@ public class Model : INotifyPropertyChanged
                 _startButtonOnStart = true;
                 RaisePropertyChanged(nameof(StartButtonText));
                 RaisePropertyChanged(nameof(Activity));
+                // displays the popup over other application, which makes the main window invisible (see xaml)
+                // closing the popup show it again
+                popup = new PopupWindow();
+                popup.Show();
+                RaisePropertyChanged(nameof(popup));
             }
         }
     }
@@ -172,5 +182,6 @@ public class Model : INotifyPropertyChanged
 
         NotesDisplayed = !NotesDisplayed;
         RaisePropertyChanged(nameof(NotesToggleLabel));
+        RaisePropertyChanged(nameof(NotesDisplayed));
     }
 }

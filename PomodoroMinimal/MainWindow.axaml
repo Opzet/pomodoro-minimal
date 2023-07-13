@@ -11,8 +11,8 @@
         MaxHeight="260"
         MaxWidth="356"
         x:DataType="local:Model"
-        RequestedThemeVariant="Light">
-    
+        RequestedThemeVariant="Light"
+        IsVisible="{Binding !popup.IsVisible}">
     
     <Design.DataContext>
         <local:Model/>
@@ -24,8 +24,9 @@
         <Button HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" FontSize="12"
                 Command="{Binding StartStopClick}" Content="{Binding StartButtonText}" 
                 IsEnabled="{Binding StartButtonOn}"></Button>
-        <ToggleButton Name="NoteToggle" HorizontalAlignment="Center" Background="Transparent" 
-                      Content="{Binding NotesToggleLabel}" Command="{Binding NotesToggled}"></ToggleButton>
-        <TextBox HorizontalAlignment="Center" Text="{Binding Notes}" IsVisible="{Binding #NoteToggle.IsChecked}" Width="300"></TextBox>
+        <Button Name="NoteToggle" HorizontalAlignment="Center" Background="Transparent" 
+                      Content="{Binding NotesToggleLabel}" Command="{Binding NotesToggled}">
+        </Button>
+        <TextBox HorizontalAlignment="Center" Text="{Binding Notes}" IsVisible="{Binding NotesDisplayed}" Width="300"></TextBox>
     </StackPanel>
 </Window>

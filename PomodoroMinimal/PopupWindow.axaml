@@ -1,0 +1,20 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PomodoroMinimal"
+        mc:Ignorable="d" d:DesignWidth="260" d:DesignHeight="60"
+        x:Class="PomodoroMinimal.PopupWindow"
+        Title="PomodoroMinimal"
+        MinHeight="60"
+        MinWidth="260"
+        MaxHeight="60"
+        MaxWidth="260"
+        x:DataType="local:Model"
+        RequestedThemeVariant="Light">
+    
+    <Design.DataContext>
+        <local:Model/>
+    </Design.DataContext>
+    <TextBlock Text="Your session has ended" HorizontalAlignment="Center" VerticalAlignment="Center" TextDecorations=""></TextBlock>
+</Window>
