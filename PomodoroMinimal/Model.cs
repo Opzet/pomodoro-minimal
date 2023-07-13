@@ -167,7 +167,7 @@ public class Model : INotifyPropertyChanged
         RaisePropertyChanged(nameof(StartButtonOn));
         if (NotesDisplayed)
         {
-            using (StreamWriter sw = File.AppendText("distractions.txt"))
+            using (StreamWriter sw = File.AppendText(_pathToNotes))
             {
                 if (Notes != "")
                 {
