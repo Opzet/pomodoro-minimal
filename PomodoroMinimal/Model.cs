@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Avalonia.Threading;
@@ -9,11 +10,24 @@ public enum State { Work, ShortBreak, LongBreak, Settings };
 
 public class Config
 {
-    public byte WorkTime { get; set; } = 30;
-    public byte ShortBreakTime { get; set; } = 5;
-    public byte LongBreakTime { get; set; } = 15;
+    public byte? WorkTimeInput { get; set; } = 30;
+    public byte? ShortBreakTimeInput { get; set; } = 5;
+    public byte? LongBreakTimeInput { get; set; } = 15;
+    public byte? LongBreakPeriodInput { get; set; } = 3;
+
+    public void ProcessConfigInput()
+    {
+        WorkTime = (byte)WorkTimeInput!;
+        ShortBreakTime = (byte)ShortBreakTimeInput!;
+        LongBreakTime = (byte)LongBreakTimeInput!;
+        LongBreakPeriod = (byte)LongBreakPeriodInput!;
+    }
+    
+    public byte WorkTime { get; private set; }
+    public byte ShortBreakTime { get; private set; }
+    public byte LongBreakTime { get; private set; }
     // how many shortBreaks are between two longBreaks
-    public byte LongBreakPeriod { get; set; } = 3;
+    public byte LongBreakPeriod { get; private set; }
 }
 
 public class PomodoroTimer
@@ -37,7 +51,7 @@ public class PomodoroTimer
             Minutes--;
         }
 
-        Seconds -= 20;
+        Seconds -= 1;
         // time is over
         if (Minutes == 0 && Seconds == 0)
         {
@@ -67,7 +81,6 @@ public class PomodoroTimer
 
             On = false;
         }
-        Console.WriteLine($"{Minutes:00}:{Seconds:00}");
         return state;
     }
 
@@ -125,6 +138,7 @@ public class Model : INotifyPropertyChanged
     public void ApplyClick()
     {
         _state = State.Work;
+        Config.ProcessConfigInput();
         Timer = new PomodoroTimer(Config);
         _clock = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.MaxValue,
             new System.EventHandler(TimerTick));
@@ -136,7 +150,6 @@ public class Model : INotifyPropertyChanged
     {
         if (Timer.On)
         {
-            var previousState = _state;
             _state = Timer.SecondUpdate(_state);
             RaisePropertyChanged(nameof(Time));
             // if the update turned off the timer, it is due to activity change
