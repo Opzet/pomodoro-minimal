@@ -18,15 +18,38 @@
         <local:Model/>
     </Design.DataContext>
     
-    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5">
-        <TextBlock HorizontalAlignment="Center" FontSize="14" Text="{Binding Activity}"></TextBlock>
-        <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Time}"></TextBlock>
-        <Button HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" FontSize="12"
-                Command="{Binding StartStopClick}" Content="{Binding StartButtonText}" 
-                IsEnabled="{Binding StartButtonOn}"></Button>
-        <Button Name="NoteToggle" HorizontalAlignment="Center" Background="Transparent" 
-                      Content="{Binding NotesToggleLabel}" Command="{Binding NotesToggled}">
-        </Button>
-        <TextBox HorizontalAlignment="Center" Text="{Binding Notes}" IsVisible="{Binding NotesDisplayed}" Width="300"></TextBox>
-    </StackPanel>
+    <Panel>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5" IsVisible="{Binding !IsInSettings}">
+            <TextBlock HorizontalAlignment="Center" FontSize="14" Text="{Binding Activity}"></TextBlock>
+            <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Time}"></TextBlock>
+            <Button HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" FontSize="12"
+                    Command="{Binding StartStopClick}" Content="{Binding StartButtonText}"
+                    IsEnabled="{Binding StartButtonOn}"></Button>
+            <Button Name="NoteToggle" HorizontalAlignment="Center" Background="Transparent"
+                          Content="{Binding NotesToggleLabel}" Command="{Binding NotesToggled}">
+            </Button>
+            <TextBox HorizontalAlignment="Center" Text="{Binding Notes}" IsVisible="{Binding NotesDisplayed}" Width="300"></TextBox>
+        </StackPanel>
+        
+        <!-- Settings -->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5" IsVisible="{Binding IsInSettings}">
+            <DockPanel LastChildFill="False">
+                <TextBlock VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10">Work</TextBlock>
+                <NumericUpDown Value="{Binding Config.workTime}" DockPanel.Dock="Right" Width="110" Increment="1"></NumericUpDown>
+            </DockPanel>
+            <DockPanel LastChildFill="False">
+                <TextBlock VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10">Short break</TextBlock>
+                <NumericUpDown Value="5" DockPanel.Dock="Right" Width="110"></NumericUpDown>
+            </DockPanel>
+            <DockPanel LastChildFill="False">
+                <TextBlock VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10">Long break</TextBlock>
+                <NumericUpDown Value="15" DockPanel.Dock="Right" Width="110"></NumericUpDown>
+            </DockPanel>
+            <DockPanel LastChildFill="False">
+                <TextBlock VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10">Long break period</TextBlock>
+                <NumericUpDown Value="3" DockPanel.Dock="Right" Width="110"></NumericUpDown>
+            </DockPanel>
+            <Button VerticalAlignment="Center" Content="APPLY" Command="{Binding ApplyClick}"></Button>
+        </StackPanel>
+    </Panel>
 </Window>

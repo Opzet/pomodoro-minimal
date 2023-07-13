@@ -2,23 +2,18 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Controls.Primitives;
 using Avalonia.Threading;
-
 namespace PomodoroMinimal;
 
-public enum State { Work, ShortBreak, LongBreak };
+public enum State { Work, ShortBreak, LongBreak, Settings };
 
 public class Config
 {
-    public byte workTime = 1;
-    public byte shortBreakTime = 2;
-    public byte longBreakTime = 3;
+    public byte workTime { get; set; } = 1;
+    public byte shortBreakTime { get; set; } = 2;
+    public byte longBreakTime { get; set; } = 3;
     // how many shortBreaks are between two longBreaks
-    public byte longBreakPeriod = 1;
-    public string[] descriptors = new string[] { "work", "short break", "long break" };
+    public byte longBreakPeriod { get; set; } = 1;
 }
 
 public class PomodoroTimer
@@ -85,12 +80,13 @@ public class PomodoroTimer
 }
 public class Model : INotifyPropertyChanged
 {
-    private Config _config = new();
-    public State state;
+    public Config Config { get; } = new();
+    public State state = State.Settings;
+    public bool IsInSettings => state == State.Settings;
     
     // Timer setup
     private DispatcherTimer _clock;
-    public PomodoroTimer Timer { get; }
+    public PomodoroTimer Timer { get; set; }
     public string Time => $"{Timer.minutes:00}:{Timer.seconds:00}";
     
     // Start button setup
@@ -124,9 +120,16 @@ public class Model : INotifyPropertyChanged
     
     public Model()
     {
-        Timer = new PomodoroTimer(_config);
+    }
+
+    public void ApplyClick()
+    {
+        state = State.Work;
+        Timer = new PomodoroTimer(Config);
         _clock = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.MaxValue,
             new System.EventHandler(TimerTick));
+        RaisePropertyChanged(nameof(Time));
+        RaisePropertyChanged(nameof(IsInSettings));
     }
     
     private void TimerTick(object? sender, EventArgs e)
