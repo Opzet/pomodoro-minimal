@@ -10,6 +10,7 @@
         MinWidth="356"
         MaxHeight="260"
         MaxWidth="356"
+        Icon="/Assets/tomato.ico"
         x:DataType="local:Model"
         RequestedThemeVariant="Light"
         IsVisible="{Binding !Popup.IsVisible}">
