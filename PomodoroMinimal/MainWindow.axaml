@@ -29,7 +29,10 @@
             <Button Name="NoteToggle" HorizontalAlignment="Center" Background="Transparent"
                           Content="{Binding NotesToggleLabel}" Command="{Binding NotesToggled}">
             </Button>
-            <TextBox HorizontalAlignment="Center" Text="{Binding Notes}" IsVisible="{Binding NotesDisplayed}" Width="300"></TextBox>
+            <Grid>
+                <TextBox HorizontalAlignment="Center" Text="{Binding Notes}" TextWrapping="Wrap" AcceptsReturn="True"
+                         IsVisible="{Binding NotesDisplayed}" Width="300"></TextBox>
+            </Grid>
         </StackPanel>
         
         <!-- Settings -->
