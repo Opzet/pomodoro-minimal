@@ -12,13 +12,14 @@
         MaxWidth="356"
         x:DataType="local:Model"
         RequestedThemeVariant="Light"
-        IsVisible="{Binding !popup.IsVisible}">
+        IsVisible="{Binding !Popup.IsVisible}">
     
     <Design.DataContext>
         <local:Model/>
     </Design.DataContext>
     
     <Panel>
+        <!-- Main timer view -->
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5" IsVisible="{Binding !IsInSettings}">
             <TextBlock HorizontalAlignment="Center" FontSize="14" Text="{Binding Activity}"></TextBlock>
             <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Time}"></TextBlock>
@@ -35,7 +36,7 @@
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5" IsVisible="{Binding IsInSettings}">
             <DockPanel LastChildFill="False">
                 <TextBlock VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10">Work</TextBlock>
-                <NumericUpDown Value="{Binding Config.workTime}" DockPanel.Dock="Right" Width="110" Increment="1"></NumericUpDown>
+                <NumericUpDown Value="{Binding Config.WorkTime}" DockPanel.Dock="Right" Width="110" Increment="1"></NumericUpDown>
             </DockPanel>
             <DockPanel LastChildFill="False">
                 <TextBlock VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10">Short break</TextBlock>

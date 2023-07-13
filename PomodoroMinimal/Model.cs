@@ -9,57 +9,57 @@ public enum State { Work, ShortBreak, LongBreak, Settings };
 
 public class Config
 {
-    public byte workTime { get; set; } = 1;
-    public byte shortBreakTime { get; set; } = 2;
-    public byte longBreakTime { get; set; } = 3;
+    public byte WorkTime { get; set; } = 30;
+    public byte ShortBreakTime { get; set; } = 5;
+    public byte LongBreakTime { get; set; } = 15;
     // how many shortBreaks are between two longBreaks
-    public byte longBreakPeriod { get; set; } = 1;
+    public byte LongBreakPeriod { get; set; } = 3;
 }
 
 public class PomodoroTimer
 {
     public bool On = false;
-    public byte minutes;
-    public byte seconds;
+    public byte Minutes;
+    public byte Seconds;
     // how many short breaks have I gone through
-    private byte periodCounter = 0;
+    private byte _periodCounter = 0;
 
-    private Config _config;
+    private readonly Config _config;
     
 
     // updates the clock and returns the after-state
     public State SecondUpdate(State currentState)
     {
         State state = currentState;
-        if (seconds == 0)
+        if (Seconds == 0)
         { 
-            seconds = 60;
-            minutes--;
+            Seconds = 60;
+            Minutes--;
         }
 
-        seconds -= 20;
+        Seconds -= 20;
         // time is over
-        if (minutes == 0 && seconds == 0)
+        if (Minutes == 0 && Seconds == 0)
         {
             switch (state)
             {
                 case State.Work:
-                    periodCounter = (byte)((periodCounter + 1) % (_config.longBreakPeriod + 1));
-                    if (periodCounter == 0)
+                    _periodCounter = (byte)((_periodCounter + 1) % (_config.LongBreakPeriod + 1));
+                    if (_periodCounter == 0)
                     { 
                         state = State.LongBreak;
-                        minutes = _config.longBreakTime;
+                        Minutes = _config.LongBreakTime;
                     }
                     else
                     { 
                         state = State.ShortBreak;
-                        minutes = _config.shortBreakTime;
+                        Minutes = _config.ShortBreakTime;
                     }
                     break;
                 case State.ShortBreak:
                 case State.LongBreak:
                     state = State.Work;
-                    minutes = _config.workTime;
+                    Minutes = _config.WorkTime;
                     break;
                 default:
                     break;
@@ -67,7 +67,7 @@ public class PomodoroTimer
 
             On = false;
         }
-        Console.WriteLine($"{minutes:00}:{seconds:00}");
+        Console.WriteLine($"{Minutes:00}:{Seconds:00}");
         return state;
     }
 
@@ -75,19 +75,19 @@ public class PomodoroTimer
     public PomodoroTimer(Config config)
     {
         _config = config;
-        minutes = config.workTime;
+        Minutes = config.WorkTime;
     }
 }
 public class Model : INotifyPropertyChanged
 {
     public Config Config { get; } = new();
-    public State state = State.Settings;
-    public bool IsInSettings => state == State.Settings;
+    private State _state = State.Settings;
+    public bool IsInSettings => _state == State.Settings;
     
     // Timer setup
     private DispatcherTimer _clock;
     public PomodoroTimer Timer { get; set; }
-    public string Time => $"{Timer.minutes:00}:{Timer.seconds:00}";
+    public string Time => $"{Timer.Minutes:00}:{Timer.Seconds:00}";
     
     // Start button setup
     public bool StartButtonOn { get; private set; } = true;
@@ -98,17 +98,17 @@ public class Model : INotifyPropertyChanged
     
     // Activity text setup
     private string[] _activities = new string[] { "work", "short break", "long break" };
-    public string Activity => _activities[(int)state];
+    public string Activity => _activities[(int)_state];
     
     // Note toggle setup
     //private string[] _toggleTexts = new string[] { "v", "^" };
     public bool NotesDisplayed { get; set; }
     public string Notes { get; set; }
-    private string PathToNotes = "distractions.txt";
+    private string _pathToNotes = "distractions.txt";
     private readonly string[] _notesToggleLabels = new string[] { "v", "^" };
     public string NotesToggleLabel => NotesDisplayed ? _notesToggleLabels[1] : _notesToggleLabels[0];
 
-    public PopupWindow popup { get; set; } = new ();
+    public PopupWindow Popup { get; set; } = new ();
     
     public event PropertyChangedEventHandler? PropertyChanged;
     
@@ -124,7 +124,7 @@ public class Model : INotifyPropertyChanged
 
     public void ApplyClick()
     {
-        state = State.Work;
+        _state = State.Work;
         Timer = new PomodoroTimer(Config);
         _clock = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.MaxValue,
             new System.EventHandler(TimerTick));
@@ -136,8 +136,8 @@ public class Model : INotifyPropertyChanged
     {
         if (Timer.On)
         {
-            var previousState = state;
-            state = Timer.SecondUpdate(state);
+            var previousState = _state;
+            _state = Timer.SecondUpdate(_state);
             RaisePropertyChanged(nameof(Time));
             // if the update turned off the timer, it is due to activity change
             if (!Timer.On)
@@ -147,9 +147,9 @@ public class Model : INotifyPropertyChanged
                 RaisePropertyChanged(nameof(Activity));
                 // displays the popup over other application, which makes the main window invisible (see xaml)
                 // closing the popup show it again
-                popup = new PopupWindow();
-                popup.Show();
-                RaisePropertyChanged(nameof(popup));
+                Popup = new PopupWindow();
+                Popup.Show();
+                RaisePropertyChanged(nameof(Popup));
             }
         }
     }
