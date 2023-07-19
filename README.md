@@ -19,5 +19,3 @@ Furthermore, if any distracting thought comes to your attention, the program off
 ![](./Images/distraction.png)
 
 What are you waiting for? The mighty Pomodoro awaits you!
-
-![](./Images/work-end.png)

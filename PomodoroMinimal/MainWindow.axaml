@@ -1,0 +1,65 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PomodoroMinimal"
+        mc:Ignorable="d" d:DesignWidth="356" d:DesignHeight="260"
+        x:Class="PomodoroMinimal.MainWindow"
+        Title="PomodoroMinimal"
+        MinHeight="260"
+        MinWidth="356"
+        MaxHeight="260"
+        MaxWidth="356"
+        Icon="/Assets/tomato.ico"
+        x:DataType="local:Model"
+        RequestedThemeVariant="Light"
+        IsVisible="{Binding !Popup.IsVisible}">
+    
+    <Design.DataContext>
+        <local:Model/>
+    </Design.DataContext>
+    
+    <Panel>
+        <!-- Main timer view -->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5" IsVisible="{Binding !IsInSettings}">
+            <TextBlock HorizontalAlignment="Center" FontSize="14" Text="{Binding Activity}"></TextBlock>
+            <TextBlock HorizontalAlignment="Center" FontSize="36" Text="{Binding Time}"></TextBlock>
+            <Button HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" FontSize="12"
+                    Command="{Binding StartStopClick}" Content="{Binding StartButtonText}"
+                    IsEnabled="{Binding StartButtonOn}"></Button>
+            <Button Name="NoteToggle" HorizontalAlignment="Center" Background="Transparent"
+                          Content="{Binding NotesToggleLabel}" Command="{Binding NotesToggled}">
+            </Button>
+            <Grid>
+                <TextBox HorizontalAlignment="Center" Text="{Binding Notes}" TextWrapping="Wrap" AcceptsReturn="True"
+                         IsVisible="{Binding NotesDisplayed}" Width="300"></TextBox>
+            </Grid>
+        </StackPanel>
+        
+        <!-- Settings -->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5" IsVisible="{Binding IsInSettings}">
+            <DockPanel LastChildFill="False">
+                <TextBlock VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10">Work</TextBlock>
+                <NumericUpDown Value="{Binding Config.WorkTimeInput}" DockPanel.Dock="Right" Width="110" 
+                               Increment="1" Minimum="0" Name="WorkNum" ></NumericUpDown>
+            </DockPanel>
+            <DockPanel LastChildFill="False">
+                <TextBlock VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10">Short break</TextBlock>
+                <NumericUpDown Value="{Binding Config.ShortBreakTimeInput}" DockPanel.Dock="Right" Width="110"
+                               Increment="1" Minimum="0"></NumericUpDown>
+            </DockPanel>
+            <DockPanel LastChildFill="False">
+                <TextBlock VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10">Long break</TextBlock>
+                <NumericUpDown Value="{Binding Config.LongBreakTimeInput}" DockPanel.Dock="Right" Width="110"
+                               Increment="1" Minimum="0"></NumericUpDown>
+            </DockPanel>
+            <DockPanel LastChildFill="False">
+                <TextBlock VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10">Long break period</TextBlock>
+                <NumericUpDown Value="{Binding Config.LongBreakPeriodInput}" DockPanel.Dock="Right" Width="110"
+                               Increment="1" Minimum="0"></NumericUpDown>
+            </DockPanel>
+            <Button HorizontalAlignment="Center" Background="Transparent" BorderBrush="Black" FontSize="12"
+                    Margin="0 5 0 0" Content="APPLY" Command="{Binding ApplyClick}"></Button>
+        </StackPanel>
+    </Panel>
+</Window>
