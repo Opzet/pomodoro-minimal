@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -8,26 +10,74 @@ namespace PomodoroMinimal;
 
 public enum State { Work, ShortBreak, LongBreak, Settings };
 
-public class Config
+public abstract class PropertyChangedRaiser : INotifyPropertyChanged
 {
-    public byte? WorkTimeInput { get; set; } = 30;
-    public byte? ShortBreakTimeInput { get; set; } = 5;
-    public byte? LongBreakTimeInput { get; set; } = 15;
-    public byte? LongBreakPeriodInput { get; set; } = 3;
-
-    public void ProcessConfigInput()
-    {
-        WorkTime = (byte)WorkTimeInput!;
-        ShortBreakTime = (byte)ShortBreakTimeInput!;
-        LongBreakTime = (byte)LongBreakTimeInput!;
-        LongBreakPeriod = (byte)LongBreakPeriodInput!;
-    }
+    public event PropertyChangedEventHandler? PropertyChanged;
     
-    public byte WorkTime { get; private set; }
-    public byte ShortBreakTime { get; private set; }
-    public byte LongBreakTime { get; private set; }
+    // raises the above event
+    protected void RaisePropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}
+
+public class Config : PropertyChangedRaiser
+{
+    private byte? _work = 30;
+
+    [Required]
+    public byte? Work
+    {
+        get => _work;
+        set
+        {
+            _work = value;
+            RaisePropertyChanged(nameof(ValidSettings));
+        }
+    }
+
+    private byte? _shortBreak = 5;
+
+    [Required]
+    public byte? ShortBreak
+    {
+        get => _shortBreak;
+        set
+        {
+            _shortBreak = value;
+            RaisePropertyChanged(nameof(ValidSettings));
+        }
+    }
+
+    private byte? _longBreak = 15;
+
+    [Required]
+    public byte? LongBreak
+    {
+        get => _longBreak;
+        set
+        {
+            _longBreak = value;
+            RaisePropertyChanged(nameof(ValidSettings));
+        }
+    }
+
     // how many shortBreaks are between two longBreaks
-    public byte LongBreakPeriod { get; private set; }
+    private byte? _longBreakPeriod = 2;
+
+    [Required]
+    public byte? LongBreakPeriod
+    {
+        get => _longBreakPeriod;
+        set
+        {
+            _longBreakPeriod = value;
+            RaisePropertyChanged(nameof(ValidSettings));
+        }
+    }
+
+    public bool ValidSettings => Work.HasValue && ShortBreak.HasValue &&
+                                 LongBreak.HasValue && LongBreakPeriod.HasValue;
 }
 
 public class PomodoroTimer
@@ -39,7 +89,9 @@ public class PomodoroTimer
     private byte _periodCounter = 0;
 
     private readonly Config _config;
-    
+    // this value would be used if user didnt fill the input
+    // because the apply button is enabled only with valid settings, this just suppresses errors
+    private const byte _defaultTimingOption = 0;
 
     // updates the clock and returns the after-state
     public State SecondUpdate(State currentState)
@@ -62,18 +114,18 @@ public class PomodoroTimer
                     if (_periodCounter == 0)
                     { 
                         state = State.LongBreak;
-                        Minutes = _config.LongBreakTime;
+                        Minutes = _config.LongBreak ?? _defaultTimingOption;
                     }
                     else
                     { 
                         state = State.ShortBreak;
-                        Minutes = _config.ShortBreakTime;
+                        Minutes = _config.ShortBreak ?? _defaultTimingOption;
                     }
                     break;
                 case State.ShortBreak:
                 case State.LongBreak:
                     state = State.Work;
-                    Minutes = _config.WorkTime;
+                    Minutes = _config.Work ?? _defaultTimingOption;
                     break;
                 default:
                     break;
@@ -88,10 +140,10 @@ public class PomodoroTimer
     public PomodoroTimer(Config config)
     {
         _config = config;
-        Minutes = config.WorkTime;
+        Minutes = config.Work ?? _defaultTimingOption;
     }
 }
-public class Model : INotifyPropertyChanged
+public class Model : PropertyChangedRaiser
 {
     public Config Config { get; } = new();
     private State _state = State.Settings;
@@ -123,14 +175,6 @@ public class Model : INotifyPropertyChanged
 
     public PopupWindow Popup { get; set; } = new ();
     
-    public event PropertyChangedEventHandler? PropertyChanged;
-    
-    // raises the above event
-    private void RaisePropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-    
     public Model()
     {
     }
@@ -139,7 +183,6 @@ public class Model : INotifyPropertyChanged
     {
         _state = State.Work;
         RaisePropertyChanged(nameof(Activity));
-        Config.ProcessConfigInput();
         Timer = new PomodoroTimer(Config);
         _clock = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.MaxValue,
             new System.EventHandler(TimerTick));
