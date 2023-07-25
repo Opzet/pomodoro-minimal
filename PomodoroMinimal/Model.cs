@@ -4,16 +4,21 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
+
 using Avalonia.Threading;
+
+using static PomodoroMinimal.Model;
+
 namespace PomodoroMinimal;
 
-public enum State { Work, ShortBreak, LongBreak, Settings };
 
 public abstract class PropertyChangedRaiser : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
-    
+
     // raises the above event
     protected void RaisePropertyChanged([CallerMemberName] string? propertyName = null)
     {
@@ -23,7 +28,7 @@ public abstract class PropertyChangedRaiser : INotifyPropertyChanged
 
 public class Config : PropertyChangedRaiser
 {
-    private byte? _work = 30;
+    private byte? _work = (int)States.Work;
 
     [Required]
     public byte? Work
@@ -36,7 +41,7 @@ public class Config : PropertyChangedRaiser
         }
     }
 
-    private byte? _shortBreak = 5;
+    private byte? _shortBreak = (int)States.ShortBreak;
 
     [Required]
     public byte? ShortBreak
@@ -49,7 +54,7 @@ public class Config : PropertyChangedRaiser
         }
     }
 
-    private byte? _longBreak = 15;
+    private byte? _longBreak = (int)States.LongBreak;
 
     [Required]
     public byte? LongBreak
@@ -63,7 +68,7 @@ public class Config : PropertyChangedRaiser
     }
 
     // how many shortBreaks are between two longBreaks
-    private byte? _longBreakPeriod = 2;
+    private byte? _longBreakPeriod = (int)States.LongBreakPeriod;
 
     [Required]
     public byte? LongBreakPeriod
@@ -88,17 +93,17 @@ public class PomodoroTimer
     // how many short breaks have I gone through
     private byte _periodCounter = 0;
 
-    private readonly Config _config;
+    private readonly Config _config = new Config();
     // this value would be used if user didnt fill the input
     // because the apply button is enabled only with valid settings, this just suppresses errors
     private const byte _defaultTimingOption = 0;
 
     // updates the clock and returns the after-state
-    public State SecondUpdate(State currentState)
+    public States SecondUpdate(States currentState)
     {
-        State state = currentState;
+        States state = currentState;
         if (Seconds == 0)
-        { 
+        {
             Seconds = 60;
             Minutes--;
         }
@@ -109,22 +114,22 @@ public class PomodoroTimer
         {
             switch (state)
             {
-                case State.Work:
+                case States.Work:
                     _periodCounter = (byte)((_periodCounter + 1) % (_config.LongBreakPeriod + 1));
                     if (_periodCounter == 0)
-                    { 
-                        state = State.LongBreak;
+                    {
+                        state = States.LongBreak;
                         Minutes = _config.LongBreak ?? _defaultTimingOption;
                     }
                     else
-                    { 
-                        state = State.ShortBreak;
+                    {
+                        state = States.ShortBreak;
                         Minutes = _config.ShortBreak ?? _defaultTimingOption;
                     }
                     break;
-                case State.ShortBreak:
-                case State.LongBreak:
-                    state = State.Work;
+                case States.ShortBreak:
+                case States.LongBreak:
+                    state = States.Work;
                     Minutes = _config.Work ?? _defaultTimingOption;
                     break;
                 default:
@@ -146,42 +151,111 @@ public class PomodoroTimer
 public class Model : PropertyChangedRaiser
 {
     public Config Config { get; } = new();
-    private State _state = State.Settings;
-    public bool IsInSettings => _state == State.Settings;
-    
+    private States _state = States.Settings;
+    public bool IsInSettings => _state == States.Settings;
+
     // Timer setup
-    private DispatcherTimer _clock;
-    public PomodoroTimer Timer { get; set; }
+    private DispatcherTimer _clock = new DispatcherTimer();
+    public PomodoroTimer Timer { get; set; } = new PomodoroTimer(new Config());
     public string Time => $"{Timer.Minutes:00}:{Timer.Seconds:00}";
-    
+
     // Start button setup
     public bool StartButtonOn { get; private set; } = true;
     private bool _startButtonOnStart = true;
     private readonly string[] StartButtonLabels = new[] { "START", "STOP" };
 
     public string StartButtonText => _startButtonOnStart ? StartButtonLabels[0] : StartButtonLabels[1];
-    
-    // Activity text setup
-    private string[] _activities = new string[] { "work", "short break", "long break" };
-    public string Activity => _activities[(int)_state];
-    
+
+    /// <summary>
+    /// Simplify by using reflection to set/get state from enum  ;)
+    /// Makes for easy setup
+    /// </summary>
+    [System.ComponentModel.Description("States")]
+    public enum States : Int32
+    {
+        // Note: Cannot have same startup time periods for short and long break, need to be unique times as they are an index
+        [System.ComponentModel.DataAnnotations.Display(Name = "Settings")]
+        Settings = 0,
+        LongBreakPeriod = 2, //Not used as a string so no need for dataannotation
+        [System.ComponentModel.DataAnnotations.Display(Name = "Short Break")]
+        ShortBreak = 5,
+        [System.ComponentModel.DataAnnotations.Display(Name = "Long Break")]
+        LongBreak = 15,
+        [System.ComponentModel.DataAnnotations.Display(Name = "Work")]
+        Work = 30,
+    }
+
+    public string Activity => EnumIdToString<States>(_state);
+
     // Note toggle setup
     //private string[] _toggleTexts = new string[] { "v", "^" };
     public bool NotesDisplayed { get; set; }
-    public string Notes { get; set; }
+    public string? Notes { get; set; }
     private string _pathToNotes = "distractions.txt";
     private readonly string[] _notesToggleLabels = new string[] { "v", "^" };
     public string NotesToggleLabel => NotesDisplayed ? _notesToggleLabels[1] : _notesToggleLabels[0];
 
-    public PopupWindow Popup { get; set; } = new ();
-    
+    public PopupWindow Popup { get; set; } = new();
+
     public Model()
     {
     }
 
+    /// <summary>
+    /// Convert Enum Id to Data Annotations string
+    /// </summary>
+    /// <typeparam name="TEnum"></typeparam>
+    /// <param name="EnumObj"></param>
+    /// <returns></returns>
+    public static string EnumIdToString<TEnum>(object EnumObj)
+    {
+        if (EnumObj == null)
+            return " ";
+
+        int EnumId = (int)EnumObj;
+
+        var enumType = typeof(TEnum);
+        var fields = enumType.GetMembers()
+            .OfType<System.Reflection.FieldInfo>()
+            .Where(p => p.MemberType == MemberTypes.Field)
+            .Where(p => p.IsLiteral)
+            .ToList();
+
+        var valuesByName = new Dictionary<string, object>();
+
+        foreach (var field in fields)
+        {
+
+            //Need reference to Data Annotation 
+            var dataAttribute = field.GetCustomAttribute(typeof(DisplayAttribute), false) as DisplayAttribute;
+
+            var value = (int)field.GetValue(null);
+            var description = string.Empty;
+
+            if (!string.IsNullOrEmpty(dataAttribute?.Name))
+            {
+                description = dataAttribute.Name;
+            }
+            else
+            {
+                description = field.Name;
+            }
+
+            if (value == EnumId)
+            {
+                if ((description.Trim() == "-") || (description.Trim().ToUpper() == "NOT APPLICABLE"))
+                    return " ";
+                else
+                    return description;
+            }
+        }
+
+        return " ";
+    }
+
     public void ApplyClick()
     {
-        _state = State.Work;
+        _state = States.Work;
         RaisePropertyChanged(nameof(Activity));
         Timer = new PomodoroTimer(Config);
         _clock = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.MaxValue,
@@ -189,12 +263,14 @@ public class Model : PropertyChangedRaiser
         RaisePropertyChanged(nameof(Time));
         RaisePropertyChanged(nameof(IsInSettings));
     }
-    
+
     private void TimerTick(object? sender, EventArgs e)
     {
         if (Timer.On)
         {
-            _state = Timer.SecondUpdate(_state);
+            States state = Enum.TryParse<States>(_state.ToString(), out var result) ? result : States.Settings;
+
+            _state = Timer.SecondUpdate(state);
             RaisePropertyChanged(nameof(Time));
             // if the update turned off the timer, it is due to activity change
             if (!Timer.On)
